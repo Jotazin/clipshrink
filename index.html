@@ -1,149 +1,801 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ClipsAlta — Compactador de vídeos</title>
-<meta name="theme-color" content="#071326">
-<style>
-:root{color-scheme:dark;--bg:#06101f;--panel:#0c1b30;--panel2:#10243e;--line:#203957;--text:#edf5ff;--muted:#9cb0ca;--blue:#2f8cff;--blue2:#1764d8;--green:#44d7a1;--red:#ff647c}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -15%,#153a67 0,transparent 48%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text)}
-.wrap{width:min(980px,calc(100% - 32px));margin:auto;padding:34px 0 50px}
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:44px}.brand{display:flex;align-items:center;gap:12px;font-weight:850;font-size:22px;letter-spacing:-.7px}.logo{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,#45a4ff,#2359d9);box-shadow:0 8px 25px #1675ff33}.logo svg{width:24px}
-.pill{font-size:12px;color:#b8d4f8;border:1px solid #29476b;border-radius:99px;padding:8px 12px;background:#0b1a2d}
-.hero{text-align:center;margin-bottom:28px}.eyebrow{color:#67b4ff;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.hero h1{font-size:clamp(32px,5vw,52px);line-height:1.06;letter-spacing:-1.8px;margin:13px 0}.hero h1 span{color:#64b1ff}.hero p{max-width:590px;margin:0 auto;color:var(--muted);line-height:1.65}
-.card{background:linear-gradient(160deg,#0d2038f5,#09172af5);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 22px 70px #0003}
-.drop{display:flex;min-height:225px;align-items:center;justify-content:center;text-align:center;padding:26px;border:1.5px dashed #35577e;border-radius:17px;background:#08172a;cursor:pointer;transition:.2s}.drop:hover,.drop.drag{border-color:#58aaff;background:#0b203a}.drop-inner{max-width:440px}.upload-icon{display:grid;place-items:center;width:58px;height:58px;margin:0 auto 14px;border-radius:18px;background:#14345a;color:#69b8ff}.upload-icon svg{width:27px}.drop h2{font-size:18px;margin:0 0 8px}.drop p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.browse{color:#69b8ff;font-weight:750}.hint{font-size:11px!important;margin-top:12px!important}
-#fileInput{display:none}
-.filebox{display:none;align-items:center;gap:13px;padding:15px;margin-top:14px;border:1px solid var(--line);background:#0a192c;border-radius:14px}.fileicon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:#15345a;color:#73bdff;flex-shrink:0}.filemeta{min-width:0;flex:1}.filename{font-weight:750;overflow-wrap:anywhere;font-size:13px}.filesub{color:var(--muted);font-size:12px;margin-top:5px}.smallbtn{border:1px solid #355170;background:#10233a;color:#d9e9ff;border-radius:9px;padding:9px 11px;cursor:pointer}
-.settings{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.setting{padding:18px;border:1px solid var(--line);border-radius:15px;background:#09182a}.setting label{display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:750;margin-bottom:13px}.setting label span{color:#71baff}.setting small{display:block;color:var(--muted);font-size:11px;line-height:1.5;margin-top:10px}input[type=range]{width:100%;accent-color:#3998ff}input[type=number],select{background:#061426;border:1px solid #294361;color:var(--text);border-radius:9px;padding:10px;width:100%;font:inherit}
-.actions{display:flex;gap:12px;margin-top:18px}.primary{flex:1;border:0;border-radius:12px;padding:15px 18px;background:linear-gradient(135deg,#349cff,#2368e8);color:white;font:inherit;font-weight:850;cursor:pointer;box-shadow:0 10px 25px #187bff25;transition:.2s}.primary:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}.primary:disabled{opacity:.45;cursor:not-allowed}.secondary{border:1px solid #294361;background:#10233a;color:#dbeaff;border-radius:12px;padding:15px;cursor:pointer}
-.status{display:none;margin-top:18px;padding:17px;border-radius:14px;background:#081629;border:1px solid var(--line)}.statushead{display:flex;justify-content:space-between;gap:12px;font-size:13px;font-weight:750}.statusmsg{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.5}.track{height:7px;border-radius:99px;background:#1b304a;overflow:hidden;margin-top:14px}.bar{height:100%;width:0;background:linear-gradient(90deg,#2985ff,#55c5ff);border-radius:99px;transition:width .2s}
-.result{display:none;margin-top:18px;border:1px solid #1c644f;background:#08271f;border-radius:15px;padding:18px}.result h3{margin:0 0 7px;font-size:16px;color:#72e8b9}.result p{margin:0;color:#b6d9cf;font-size:13px;line-height:1.6}.download{display:inline-flex;margin-top:14px;text-decoration:none;color:#052318;background:#5be0ad;font-weight:850;padding:11px 15px;border-radius:10px}
-footer{color:#7389a6;text-align:center;font-size:11px;line-height:1.7;margin-top:22px}.notice{color:#91a7c3}
-@media(max-width:650px){.wrap{padding-top:22px}.pill{display:none}header{margin-bottom:34px}.card{padding:14px}.settings{grid-template-columns:1fr}.drop{min-height:205px}.actions{flex-direction:column}.hero h1{letter-spacing:-1px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d1b">
+  <title>ClipShrink — Compressor de Vídeos</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #080d1b;
+      --panel: #111a2d;
+      --panel2: #0d1527;
+      --blue: #4388ff;
+      --blue2: #2463eb;
+      --text: #f3f6ff;
+      --muted: #91a0bb;
+      --border: rgba(130, 160, 220, .16);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 50% -10%, #18366a 0%, transparent 45%),
+        var(--bg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+    }
+
+    button, input { font: inherit; }
+
+    .topbar {
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 7%;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,13,27,.65);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 21px;
+      letter-spacing: -.7px;
+    }
+
+    .brand-icon {
+      display: grid;
+      place-items: center;
+      width: 39px;
+      height: 39px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #579bff, #2559e8);
+      box-shadow: 0 5px 25px #2463eb44;
+    }
+
+    .brand-icon svg { width: 21px; height: 21px; }
+
+    .local-tag {
+      color: #a7c9ff;
+      border: 1px solid #356ac655;
+      background: #18315a66;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    main {
+      width: min(760px, 92%);
+      margin: 55px auto 70px;
+    }
+
+    .hero { text-align: center; margin-bottom: 30px; }
+
+    .eyebrow {
+      color: #78aaff;
+      text-transform: uppercase;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+    }
+
+    h1 {
+      margin: 13px 0 10px;
+      font-size: clamp(32px, 6vw, 47px);
+      letter-spacing: -2px;
+      line-height: 1.1;
+    }
+
+    h1 span {
+      background: linear-gradient(90deg, #76b4ff, #3981ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 470px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #121d32, #0d1527);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 24px;
+      box-shadow: 0 22px 70px #0003;
+    }
+
+    .dropzone {
+      min-height: 175px;
+      padding: 25px 16px;
+      border: 1.5px dashed #3d5b8b;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: #14213a66;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .dropzone:hover, .dropzone.drag {
+      border-color: var(--blue);
+      background: #1c376033;
+    }
+
+    .upload-icon {
+      margin: 0 auto 12px;
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      color: #8dbbff;
+      background: #2a5aab40;
+    }
+
+    .upload-icon svg { width: 25px; height: 25px; }
+    .drop-title { font-weight: 750; font-size: 15px; }
+    .drop-sub { margin-top: 7px; color: var(--muted); font-size: 12px; }
+    #fileInput { display: none; }
+
+    .file-info {
+      display: none;
+      margin-top: 18px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: #0b1323;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-symbol {
+      width: 43px;
+      height: 43px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: #1e3f77;
+      color: #a6ceff;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .file-details { min-width: 0; flex: 1; }
+    .file-name {
+      font-size: 13px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .file-size { color: var(--muted); font-size: 12px; margin-top: 5px; }
+
+    .remove {
+      border: 0;
+      background: transparent;
+      color: #9eacc4;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 7px;
+    }
+
+    .preview {
+      display: none;
+      margin-top: 15px;
+      width: 100%;
+      max-height: 350px;
+      background: #05080f;
+      border-radius: 14px;
+    }
+
+    .settings {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 23px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 9px;
+      color: #dbe5f8;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap input {
+      width: 100%;
+      height: 48px;
+      padding: 0 48px 0 14px;
+      border: 1px solid #2b3a56;
+      outline: none;
+      border-radius: 12px;
+      background: #0a1222;
+      color: white;
+    }
+
+    .input-wrap input:focus { border-color: var(--blue); }
+
+    .unit {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .hint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .main-button {
+      margin-top: 23px;
+      width: 100%;
+      min-height: 51px;
+      border: 0;
+      border-radius: 13px;
+      background: linear-gradient(100deg, #347eff, #2860ed);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 25px #2463eb35;
+      transition: .2s;
+    }
+
+    .main-button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .main-button:disabled { opacity: .55; cursor: wait; }
+
+    .progress-area { display: none; margin-top: 22px; }
+
+    .progress-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+
+    #status { color: #bdcbe1; }
+    #percent { color: #83b5ff; font-weight: 800; }
+
+    .progress-track {
+      height: 7px;
+      background: #26334a;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    #progressBar {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #3579ff, #7cb7ff);
+      transition: width .2s;
+    }
+
+    .message {
+      display: none;
+      padding: 13px 15px;
+      border-radius: 12px;
+      margin-top: 17px;
+      font-size: 12px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .message.error { display: block; background: #421d2a; color: #ffc0ce; }
+    .message.success { display: block; background: #12372d; color: #a3f3d1; }
+
+    .download {
+      display: none;
+      margin-top: 18px;
+      padding: 17px;
+      border: 1px solid #2c705b;
+      border-radius: 14px;
+      background: #10332955;
+    }
+
+    .download h3 { margin: 0 0 7px; font-size: 15px; }
+    .download p { color: #b4c9c3; font-size: 12px; line-height: 1.6; }
+
+    .download a {
+      display: block;
+      padding: 13px;
+      border-radius: 10px;
+      text-align: center;
+      color: white;
+      background: #16815d;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .privacy {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: #8393af;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    .privacy span { color: #82b8ff; }
+
+    footer {
+      text-align: center;
+      padding: 0 15px 30px;
+      color: #64728c;
+      font-size: 11px;
+    }
+
+    @media (max-width: 540px) {
+      .topbar { padding: 0 5%; height: 66px; }
+      .brand { font-size: 18px; }
+      .local-tag { font-size: 10px; padding: 7px 9px; }
+      main { margin-top: 38px; }
+      .card { padding: 16px; border-radius: 17px; }
+      .settings { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div class="brand"><div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z"/><path d="m10 9 5 3-5 3z"/></svg></div>Clips<span style="color:#65b4ff">Alta</span></div>
-  <div class="pill">100% no seu navegador</div>
-</header>
-<section class="hero">
-  <div class="eyebrow">Vídeos menores, sem complicação</div>
-  <h1>Comprima vídeos para o <span>Discord</span></h1>
-  <p>Reduza o tamanho do arquivo para caber no limite que você precisa. Escolha o vídeo, defina o tamanho desejado e baixe o resultado.</p>
-</section>
-<main class="card">
-  <label class="drop" id="dropZone" for="fileInput">
-    <div class="drop-inner">
-      <div class="upload-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m-5 5 5-5 5 5"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg></div>
-      <h2>Solte seu vídeo aqui</h2>
-      <p>ou <span class="browse">clique para escolher um arquivo</span></p>
-      <p class="hint">MP4, MOV, WEBM e outros formatos compatíveis · processamento local</p>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M8 5.5v13l11-6.5-11-6.5Z" fill="white"/>
+        </svg>
+      </div>
+      ClipShrink
     </div>
-  </label>
-  <input id="fileInput" type="file" accept="video/*,.mkv,.avi,.mov,.mp4,.webm">
-  <div class="filebox" id="fileBox">
-    <div class="fileicon">▶</div>
-    <div class="filemeta"><div class="filename" id="fileName"></div><div class="filesub" id="fileInfo"></div></div>
-    <button class="smallbtn" id="removeBtn" type="button">Remover</button>
-  </div>
-  <div class="settings">
-    <div class="setting">
-      <label for="targetSize">Tamanho final desejado <span><b id="sizeLabel">60</b> MB</span></label>
-      <input id="targetSize" type="range" min="8" max="500" value="60" step="1">
-      <small>Escolha um limite aproximado. O resultado pode variar conforme o vídeo.</small>
-    </div>
-    <div class="setting">
-      <label for="quality">Prioridade da compressão</label>
-      <select id="quality">
-        <option value="balanced">Equilibrada (recomendado)</option>
-        <option value="smaller">Arquivo menor</option>
-        <option value="better">Mais qualidade</option>
-      </select>
-      <small>Arquivos menores podem perder mais qualidade e demorar mais para processar.</small>
-    </div>
-  </div>
-  <div class="actions">
-    <button class="primary" id="compressBtn" disabled>Comprimir vídeo</button>
-    <button class="secondary" id="resetBtn" type="button">Limpar</button>
-  </div>
-  <div class="status" id="statusBox" aria-live="polite">
-    <div class="statushead"><span id="statusTitle">Preparando...</span><span id="percent">0%</span></div>
-    <div class="statusmsg" id="statusMsg">Aguarde enquanto o vídeo é processado.</div>
-    <div class="track"><div class="bar" id="progressBar"></div></div>
-  </div>
-  <div class="result" id="resultBox">
-    <h3>Vídeo pronto!</h3>
-    <p id="resultInfo"></p>
-    <a class="download" id="downloadLink" href="#" download="video-comprimido.mp4">Baixar vídeo comprimido</a>
-  </div>
-</main>
-<footer>Seus arquivos são processados no navegador e não são enviados para um servidor.<br><span class="notice">A primeira compressão baixa o motor de processamento. Vídeos grandes podem consumir bastante memória.</span><br><span class="notice">Créditos: Goten</span></footer>
-</div>
-<script type="module">
-const $ = id => document.getElementById(id);
-const fileInput=$('fileInput'), dropZone=$('dropZone'), fileBox=$('fileBox'), compressBtn=$('compressBtn');
-let selectedFile=null, ffmpeg=null, outputUrl=null, busy=false;
-const formatBytes = n => { if(!Number.isFinite(n)) return 'tamanho desconhecido'; const u=['B','KB','MB','GB']; let i=0; while(n>=1024&&i<u.length-1){n/=1024;i++} return `${n.toFixed(i===0?0:2)} ${u[i]}`; };
-const setStatus=(title,msg,pct)=>{$('statusBox').style.display='block';$('statusTitle').textContent=title;$('statusMsg').textContent=msg;if(pct!==null){$('percent').textContent=`${Math.round(pct)}%`;$('progressBar').style.width=`${Math.max(0,Math.min(100,pct))}%`;}};
-function cleanOutput(){if(outputUrl){URL.revokeObjectURL(outputUrl);outputUrl=null;} $('resultBox').style.display='none';}
-function chooseFile(file){if(!file)return; if(!file.type.startsWith('video/')&&!/\.(mp4|mov|webm|mkv|avi|m4v)$/i.test(file.name)){setStatus('Arquivo não reconhecido','Escolha um arquivo de vídeo.',0);return;}selectedFile=file;cleanOutput();$('fileName').textContent=file.name;$('fileInfo').textContent=`${formatBytes(file.size)} · ${file.type||'vídeo'}`;fileBox.style.display='flex';dropZone.style.display='none';compressBtn.disabled=busy;}
-function clearFile(){selectedFile=null;fileInput.value='';fileBox.style.display='none';dropZone.style.display='flex';compressBtn.disabled=true;cleanOutput();$('statusBox').style.display='none';}
-fileInput.addEventListener('change',e=>chooseFile(e.target.files[0]));
-$('removeBtn').addEventListener('click',clearFile);$('resetBtn').addEventListener('click',()=>{if(!busy)clearFile()});
-$('targetSize').addEventListener('input',e=>$('sizeLabel').textContent=e.target.value);
-for(const ev of ['dragenter','dragover'])dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.add('drag')});
-for(const ev of ['dragleave','drop'])dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.classList.remove('drag')});
-dropZone.addEventListener('drop',e=>chooseFile(e.dataTransfer.files[0]));
-function setBusy(v){busy=v;compressBtn.disabled=v||!selectedFile;$('resetBtn').disabled=v;$('removeBtn').disabled=v;fileInput.disabled=v;}
-async function getFFmpeg(){
-  if(ffmpeg)return ffmpeg;
-  setStatus('Carregando o compressor','Baixando os componentes necessários na primeira utilização...',2);
-  const { FFmpeg } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js');
-  const { toBlobURL } = await import('https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/esm/index.js');
-  const instance=new FFmpeg();
-  instance.on('progress',({progress})=>{const p=Number.isFinite(progress)?Math.max(5,Math.min(95,progress*90+5)):10;setStatus('Comprimindo vídeo','O tempo depende do tamanho e da duração do vídeo.',p);});
-  const base='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd';
-  await instance.load({
-    coreURL: await toBlobURL(`${base}/ffmpeg-core.js`,'text/javascript'),
-    wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`,'application/wasm')
-  });
-  ffmpeg=instance;return ffmpeg;
-}
-compressBtn.addEventListener('click',async()=>{
- if(!selectedFile||busy)return;
- setBusy(true);cleanOutput();
- try{
-   const engine=await getFFmpeg();
-   setStatus('Preparando vídeo','Lendo o arquivo selecionado...',5);
-   const ext=(selectedFile.name.split('.').pop()||'mp4').toLowerCase().replace(/[^a-z0-9]/g,'');
-   const inputName=`input.${ext||'mp4'}`, outputName='video-comprimido.mp4';
-   await engine.writeFile(inputName,new Uint8Array(await selectedFile.arrayBuffer()));
-   const targetMB=Number($('targetSize').value);
-   const targetBytes=targetMB*1024*1024;
-   const estimatedSeconds=Math.max(1,selectedFile.size*8/1000000);
-   const targetBitrate=Math.max(180,Math.floor(targetBytes*8/estimatedSeconds/1000));
-   const quality=$('quality').value;
-   const factor=quality==='smaller'?0.78:quality==='better'?1.12:1;
-   const videoKbps=Math.max(120,Math.floor(targetBitrate*factor*0.88));
-   const audioKbps=quality==='smaller'?'64k':'96k';
-   setStatus('Comprimindo vídeo','O processamento acontece no seu navegador. Não feche esta página.',8);
-   await engine.exec(['-i',inputName,'-c:v','libx264','-preset',quality==='smaller'?'veryfast':quality==='better'?'slow':'medium','-b:v',`${videoKbps}k`,'-maxrate',`${Math.floor(videoKbps*1.25)}k`,'-bufsize',`${videoKbps*2}k`,'-vf','scale=\'min(1920,iw)\':-2','-c:a','aac','-b:a',audioKbps,'-movflags','+faststart','-y',outputName]);
-   const data=await engine.readFile(outputName);
-   const blob=new Blob([data],{type:'video/mp4'});
-   outputUrl=URL.createObjectURL(blob);
-   $('downloadLink').href=outputUrl;
-   const original=selectedFile.size, finalSize=blob.size, reduction=original>0?(1-finalSize/original)*100:0;
-   $('resultInfo').textContent=`Original: ${formatBytes(original)} · Comprimido: ${formatBytes(finalSize)} · ${reduction>=0?`redução de ${reduction.toFixed(1)}%`:`arquivo ${Math.abs(reduction).toFixed(1)}% maior`}. O tamanho final é aproximado e pode ficar acima do limite escolhido.`;
-   $('resultBox').style.display='block';setStatus('Compressão concluída','Seu vídeo está pronto para baixar.',100);
-   try{await engine.deleteFile(inputName);await engine.deleteFile(outputName);}catch{}
- }catch(err){
-   console.error(err);setStatus('Não foi possível concluir',`Falha ao carregar ou executar o compressor: ${err?.message||err}. Confira a conexão e tente novamente.`,0);
- }finally{setBusy(false);}
-});
-</script>
+    <div class="local-tag">🔒 Compressão privada</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Vídeos menores, sem complicação</div>
+      <h1>Seu vídeo. <span>Do tamanho certo.</span></h1>
+      <p class="subtitle">
+        Comprima vídeos para compartilhar no Discord.
+        Simples, rápido e direto no seu navegador.
+      </p>
+    </section>
+
+    <section class="card">
+      <label class="dropzone" id="dropzone" for="fileInput">
+        <div>
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16V4m-5 5 5-5 5 5"/>
+              <path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/>
+            </svg>
+          </div>
+          <div class="drop-title">Clique para escolher seu vídeo</div>
+          <div class="drop-sub">ou arraste o arquivo para esta área</div>
+        </div>
+      </label>
+
+      <input id="fileInput" type="file"
+        accept="video/*,.mp4,.mov,.webm,.mkv,.avi,.m4v">
+
+      <div class="file-info" id="fileInfo">
+        <div class="file-symbol">VIDEO</div>
+        <div class="file-details">
+          <div class="file-name" id="fileName"></div>
+          <div class="file-size" id="fileSize"></div>
+        </div>
+        <button class="remove" id="removeFile" type="button"
+          title="Remover vídeo" aria-label="Remover vídeo">×</button>
+      </div>
+
+      <video id="preview" class="preview" controls playsinline></video>
+
+      <div class="settings">
+        <div>
+          <label class="field-label" for="targetSize">Tamanho desejado</label>
+          <div class="input-wrap">
+            <input id="targetSize" type="number" min="1" max="5000"
+              value="10" step="1">
+            <span class="unit">MB</span>
+          </div>
+          <div class="hint">Informe o tamanho aproximado do arquivo final.</div>
+        </div>
+
+        <div>
+          <label class="field-label">Formato de saída</label>
+          <div class="input-wrap">
+            <input value="MP4 · H.264" readonly aria-label="Formato MP4 H.264">
+          </div>
+          <div class="hint">Compatível com a maioria dos dispositivos.</div>
+        </div>
+      </div>
+
+      <button class="main-button" id="compressBtn" type="button">
+        ✦ &nbsp; Comprimir vídeo
+      </button>
+
+      <div class="progress-area" id="progressArea">
+        <div class="progress-heading">
+          <span id="status">Preparando o compressor...</span>
+          <span id="percent">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progressBar"></div>
+        </div>
+      </div>
+
+      <div class="message" id="message" role="status" aria-live="polite"></div>
+
+      <div class="download" id="downloadBox">
+        <h3>✓ Vídeo processado!</h3>
+        <p id="resultInfo"></p>
+        <a id="downloadLink" href="#" download="clipshrink.mp4">
+          Baixar vídeo comprimido
+        </a>
+      </div>
+
+      <div class="privacy">
+        <span>🔒</span>
+        <div>
+          <strong>Seus arquivos ficam no seu dispositivo.</strong>
+          A compressão é executada no navegador. Na primeira utilização,
+          o motor de compressão precisa ser carregado da internet.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>ClipShrink · Ferramenta gratuita de compressão de vídeos</footer>
+
+  <script type="module">
+    import { FFmpeg } from
+      'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
+    import { toBlobURL } from
+      'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/esm/index.js';
+
+    const $ = (id) => document.getElementById(id);
+
+    const fileInput = $('fileInput');
+    const dropzone = $('dropzone');
+    const fileInfo = $('fileInfo');
+    const preview = $('preview');
+    const compressBtn = $('compressBtn');
+    const targetSize = $('targetSize');
+    const progressArea = $('progressArea');
+    const progressBar = $('progressBar');
+    const percent = $('percent');
+    const status = $('status');
+    const message = $('message');
+    const downloadBox = $('downloadBox');
+    const downloadLink = $('downloadLink');
+    const resultInfo = $('resultInfo');
+
+    let selectedFile = null;
+    let previewURL = null;
+    let outputURL = null;
+    let ffmpeg = null;
+    let isBusy = false;
+    let isLoaded = false;
+
+    function formatBytes(bytes) {
+      if (bytes < 1024 * 1024) {
+        return (bytes / 1024).toFixed(0) + ' KB';
+      }
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function showMessage(text, type = 'error') {
+      message.textContent = text;
+      message.className = 'message ' + type;
+    }
+
+    function clearMessage() {
+      message.textContent = '';
+      message.className = 'message';
+    }
+
+    function resetOutput() {
+      downloadBox.style.display = 'none';
+      if (outputURL) {
+        URL.revokeObjectURL(outputURL);
+        outputURL = null;
+      }
+      downloadLink.removeAttribute('href');
+    }
+
+    function setFile(file) {
+      if (!file) return;
+
+      if (file.type && !file.type.startsWith('video/')) {
+        showMessage('Escolha um arquivo de vídeo válido.');
+        return;
+      }
+
+      selectedFile = file;
+      clearMessage();
+      resetOutput();
+
+      if (previewURL) URL.revokeObjectURL(previewURL);
+      previewURL = URL.createObjectURL(file);
+
+      $('fileName').textContent = file.name;
+      $('fileSize').textContent = formatBytes(file.size);
+      fileInfo.style.display = 'flex';
+      preview.src = previewURL;
+      preview.style.display = 'block';
+      compressBtn.disabled = false;
+      compressBtn.textContent = '✦  Comprimir vídeo';
+    }
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files[0]) {
+        setFile(fileInput.files[0]);
+      }
+    });
+
+    $('removeFile').addEventListener('click', () => {
+      if (isBusy) return;
+      selectedFile = null;
+      fileInput.value = '';
+      fileInfo.style.display = 'none';
+      preview.style.display = 'none';
+      preview.removeAttribute('src');
+      if (previewURL) URL.revokeObjectURL(previewURL);
+      previewURL = null;
+      resetOutput();
+      clearMessage();
+    });
+
+    for (const eventName of ['dragenter', 'dragover']) {
+      dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropzone.classList.add('drag');
+      });
+    }
+
+    for (const eventName of ['dragleave', 'drop']) {
+      dropzone.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        dropzone.classList.remove('drag');
+      });
+    }
+
+    dropzone.addEventListener('drop', (event) => {
+      const file = event.dataTransfer?.files?.[0];
+      if (file && !isBusy) setFile(file);
+    });
+
+    function updateProgress(value, text) {
+      const safe = Math.max(0, Math.min(100, Math.round(value)));
+      progressBar.style.width = safe + '%';
+      percent.textContent = safe + '%';
+      if (text) status.textContent = text;
+    }
+
+    async function loadEngine() {
+      if (isLoaded) return;
+
+      status.textContent = 'Carregando motor de compressão...';
+      compressBtn.textContent = 'Carregando compressor...';
+
+      ffmpeg = new FFmpeg();
+
+      ffmpeg.on('progress', ({ progress }) => {
+        if (isBusy) {
+          updateProgress(
+            8 + Math.max(0, Math.min(1, progress)) * 88,
+            'Comprimindo vídeo...'
+          );
+        }
+      });
+
+      ffmpeg.on('log', ({ message: logMessage }) => {
+        console.log('[ClipShrink]', logMessage);
+      });
+
+      const base =
+  'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
+
+      await ffmpeg.load({
+        classWorkerURL: new URL('./worker.js', window.location.href).href,
+        coreURL: await toBlobURL(
+          base + '/ffmpeg-core.js', 'text/javascript'
+        ),
+        wasmURL: await toBlobURL(
+          base + '/ffmpeg-core.wasm', 'application/wasm'
+        )
+      });
+
+      isLoaded = true;
+    }
+
+    function getExtension(fileName) {
+      const match = fileName.match(/\.([a-zA-Z0-9]+)$/);
+      return match ? match[1].toLowerCase() : 'mp4';
+    }
+
+    compressBtn.addEventListener('click', async () => {
+      if (isBusy) return;
+
+      if (!selectedFile) {
+        showMessage('Escolha um vídeo antes de começar.');
+        return;
+      }
+
+      const targetMB = Number(targetSize.value);
+      if (!Number.isFinite(targetMB) || targetMB < 1 || targetMB > 5000) {
+        showMessage('Informe um tamanho entre 1 e 5000 MB.');
+        return;
+      }
+
+      isBusy = true;
+      compressBtn.disabled = true;
+      fileInput.disabled = true;
+      $('removeFile').disabled = true;
+      progressArea.style.display = 'block';
+      clearMessage();
+      resetOutput();
+      updateProgress(2, 'Iniciando...');
+
+      let inputName = '';
+      let outputName = '';
+
+      try {
+        await loadEngine();
+
+        updateProgress(5, 'Analisando duração do vídeo...');
+
+        const duration = await new Promise((resolve, reject) => {
+          const probe = document.createElement('video');
+          probe.preload = 'metadata';
+          const tempURL = URL.createObjectURL(selectedFile);
+
+          probe.onloadedmetadata = () => {
+            URL.revokeObjectURL(tempURL);
+            if (Number.isFinite(probe.duration) && probe.duration > 0) {
+              resolve(probe.duration);
+            } else {
+              reject(new Error('Não foi possível identificar a duração do vídeo.'));
+            }
+          };
+
+          probe.onerror = () => {
+            URL.revokeObjectURL(tempURL);
+            reject(new Error('Não foi possível ler esse vídeo. Tente um MP4 ou MOV.'));
+          };
+
+          probe.src = tempURL;
+        });
+
+        const ext = getExtension(selectedFile.name);
+        inputName = 'input.' + ext;
+        outputName = 'clipshrink_output.mp4';
+
+        updateProgress(7, 'Preparando arquivo...');
+
+        await ffmpeg.writeFile(
+          inputName,
+          new Uint8Array(await selectedFile.arrayBuffer())
+        );
+
+        // A taxa de bits é estimada com base no tamanho desejado
+        // e na duração. O tamanho final pode variar.
+        const targetBytes = targetMB * 1024 * 1024;
+        const totalBitrate = (targetBytes * 8) / duration;
+        const audioBitrate = 96000;
+        const videoBitrate = Math.floor(
+          Math.max(100000, totalBitrate - audioBitrate)
+        );
+        const videoK = Math.max(100, Math.floor(videoBitrate / 1000));
+        const bufferK = Math.max(videoK * 2, 200);
+
+        updateProgress(8, 'Comprimindo vídeo...');
+
+        const exitCode = await ffmpeg.exec([
+          '-y',
+          '-i', inputName,
+          '-map', '0:v:0',
+          '-map', '0:a?',
+          '-c:v', 'libx264',
+          '-preset', 'ultrafast',
+          '-b:v', `${videoK}k`,
+          '-maxrate', `${videoK}k`,
+          '-bufsize', `${bufferK}k`,
+          '-pix_fmt', 'yuv420p',
+          '-c:a', 'aac',
+          '-b:a', '96k',
+          '-ac', '2',
+          '-movflags', '+faststart',
+          outputName
+        ]);
+
+        if (exitCode !== 0) {
+          throw new Error(
+            'O FFmpeg não conseguiu processar o vídeo. Tente outro arquivo.'
+          );
+        }
+
+        updateProgress(97, 'Preparando download...');
+
+        const data = await ffmpeg.readFile(outputName);
+        const blob = new Blob([data], { type: 'video/mp4' });
+
+        outputURL = URL.createObjectURL(blob);
+        downloadLink.href = outputURL;
+        downloadLink.download =
+          (selectedFile.name.replace(/\.[^.]+$/, '') || 'video') +
+          '_comprimido.mp4';
+
+        const originalMB = selectedFile.size / (1024 * 1024);
+        const finalMB = blob.size / (1024 * 1024);
+        const difference = originalMB > 0
+          ? Math.round((1 - finalMB / originalMB) * 100)
+          : 0;
+
+        resultInfo.textContent =
+          `Original: ${originalMB.toFixed(2)} MB · ` +
+          `Final: ${finalMB.toFixed(2)} MB. ` +
+          (difference >= 0
+            ? `Redução aproximada de ${difference}%.`
+            : 'O arquivo final ficou maior que o original.');
+
+        downloadBox.style.display = 'block';
+        updateProgress(100, 'Compressão concluída!');
+        showMessage(
+          finalMB <= targetMB
+            ? 'Tudo certo! O vídeo ficou dentro do tamanho desejado.'
+            : 'Vídeo pronto, mas ficou acima do tamanho desejado. ' +
+              'Tente novamente com um limite maior ou um vídeo mais curto.',
+          'success'
+        );
+      } catch (error) {
+        console.error(error);
+        const details = error?.message || String(error);
+        showMessage('Erro na compressão: ' + details);
+        updateProgress(0, 'Não foi possível concluir.');
+      } finally {
+        if (ffmpeg && isLoaded) {
+          try {
+            if (inputName) await ffmpeg.deleteFile(inputName);
+            if (outputName) await ffmpeg.deleteFile(outputName);
+          } catch (cleanupError) {
+            console.warn('Limpeza de arquivos temporários:', cleanupError);
+          }
+        }
+
+        isBusy = false;
+        compressBtn.disabled = false;
+        fileInput.disabled = false;
+        $('removeFile').disabled = false;
+        compressBtn.textContent = '✦  Comprimir vídeo';
+      }
+    });
+  </script>
 </body>
 </html>
