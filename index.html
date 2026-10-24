@@ -74,57 +74,246 @@ footer{text-align:center;color:#657895;font-size:12px;padding:15px}
 <footer>ClipShrink · Seus vídeos permanecem no seu dispositivo.</footer>
 </main>
 
-<script>
-const picker=document.querySelector('#videoFile');
-const target=document.querySelector('#target');
-const info=document.querySelector('#fileInfo');
-const preview=document.querySelector('#preview');
-const status=document.querySelector('#status');
-const compress=document.querySelector('#compress');
-const progress=document.querySelector('#progress');
-let source=null;
-let outputUrl=null;
 
-function sizeText(bytes){
- return bytes >= 1000000000
- ? (bytes/1000000000).toFixed(2)+' GB'
- : (bytes/1000000).toFixed(2)+' MB';
+<script type="module">
+import { FFmpeg } from 'https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
+import { toBlobURL } from 'https://unpkg.com/@ffmpeg/util@0.12.2/dist/esm/index.js';
+
+const picker = document.querySelector('#videoFile');
+const target = document.querySelector('#target');
+const info = document.querySelector('#fileInfo');
+const preview = document.querySelector('#preview');
+const status = document.querySelector('#status');
+const compress = document.querySelector('#compress');
+const progress = document.querySelector('#progress');
+
+let source = null;
+let outputUrl = null;
+let ffmpeg = null;
+let loading = false;
+let running = false;
+
+function sizeText(bytes) {
+  return bytes >= 1000000000
+    ? (bytes / 1000000000).toFixed(2) + ' GB'
+    : (bytes / 1000000).toFixed(2) + ' MB';
 }
-function setStatus(text){status.textContent=text;}
 
-picker.addEventListener('change',()=>{
- const file=picker.files[0];
- if(!file)return;
- if(source)URL.revokeObjectURL(source);
- source=URL.createObjectURL(file);
- preview.src=source;
- preview.style.display='block';
- info.style.display='block';
- info.textContent=file.name+' · '+sizeText(file.size);
- document.querySelector('#originalSize').textContent=sizeText(file.size);
- document.querySelector('#result').hidden=true;
- setStatus('Vídeo selecionado. O mecanismo de compressão será carregado ao iniciar.');
+function setStatus(text) {
+  status.textContent = text;
+}
+
+async function loadEngine() {
+  if (ffmpeg) return;
+
+  if (loading) {
+    throw new Error('O motor já está sendo carregado. Aguarde.');
+  }
+
+  loading = true;
+  setStatus('Carregando o motor de compressão pela internet...');
+
+  try {
+    const engine = new FFmpeg();
+
+    engine.on('progress', ({ progress: value }) => {
+      if (running && Number.isFinite(value)) {
+        progress.value = Math.max(
+          0,
+          Math.min(99, Math.round(value * 100))
+        );
+        setStatus('Compactando vídeo: ' + progress.value + '%');
+      }
+    });
+
+    engine.on('log', ({ message }) => {
+      console.log('[ClipShrink]', message);
+    });
+
+    const base =
+      'https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd';
+
+    await engine.load({
+      coreURL: await toBlobURL(
+        base + '/ffmpeg-core.js',
+        'text/javascript'
+      ),
+      wasmURL: await toBlobURL(
+        base + '/ffmpeg-core.wasm',
+        'application/wasm'
+      )
+    });
+
+    ffmpeg = engine;
+  } finally {
+    loading = false;
+  }
+}
+
+picker.addEventListener('change', () => {
+  const file = picker.files[0];
+  if (!file) return;
+
+  if (source) URL.revokeObjectURL(source);
+  if (outputUrl) URL.revokeObjectURL(outputUrl);
+
+  source = URL.createObjectURL(file);
+  outputUrl = null;
+
+  preview.src = source;
+  preview.style.display = 'block';
+  info.style.display = 'block';
+  info.textContent = file.name + ' · ' + sizeText(file.size);
+
+  document.querySelector('#originalSize').textContent =
+    sizeText(file.size);
+
+  document.querySelector('#result').hidden = true;
+  progress.hidden = true;
+
+  setStatus('Clipe selecionado. Pronto para compactar.');
 });
-target.addEventListener('input',()=>{
- document.querySelector('#targetLabel').textContent=(target.value||'0')+' MB';
+
+target.addEventListener('input', () => {
+  document.querySelector('#targetLabel').textContent =
+    (target.value || '0') + ' MB';
 });
-document.querySelector('.upload').addEventListener('keydown',e=>{
- if(e.key==='Enter'||e.key===' '){e.preventDefault();picker.click();}
+
+document.querySelector('.upload').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    picker.click();
+  }
 });
-window.addEventListener('beforeunload',()=>{
- if(source)URL.revokeObjectURL(source);
- if(outputUrl)URL.revokeObjectURL(outputUrl);
+
+compress.addEventListener('click', async () => {
+  const file = picker.files[0];
+  const mb = Number(target.value);
+
+  if (running) return;
+
+  if (!file) {
+    setStatus('Selecione um vídeo primeiro.');
+    return;
+  }
+
+  if (!Number.isFinite(mb) || mb <= 0) {
+    setStatus('Digite um tamanho final válido em MB.');
+    return;
+  }
+
+  if (!Number.isFinite(preview.duration) ||
+      preview.duration <= 0) {
+    setStatus('Não foi possível ler a duração do vídeo.');
+    return;
+  }
+
+  const targetBytes = mb * 1024 * 1024;
+
+  if (targetBytes >= file.size) {
+    setStatus(
+      'O tamanho desejado já é igual ou maior que o original. ' +
+      'Escolha um valor menor para tentar reduzir o arquivo.'
+    );
+    return;
+  }
+
+  running = true;
+  compress.disabled = true;
+  progress.hidden = false;
+  progress.value = 0;
+
+  let inputName = 'input.mp4';
+  let outputName = 'output.mp4';
+
+  try {
+    await loadEngine();
+
+    setStatus('Preparando o vídeo no seu computador...');
+
+    const bytes = new Uint8Array(await file.arrayBuffer());
+
+    await ffmpeg.writeFile(inputName, bytes);
+
+    const duration = preview.duration;
+    const totalKbps = (targetBytes * 8) / duration / 1000;
+    const audioKbps = 96;
+    const videoKbps = Math.floor(totalKbps * 0.92 - audioKbps);
+
+    if (videoKbps < 100) {
+      throw new Error(
+        'A meta é muito pequena para esta duração. ' +
+        'Tente um tamanho maior.'
+      );
+    }
+
+    setStatus('Compactando no seu PC. Aguarde...');
+
+    const exitCode = await ffmpeg.exec([
+      '-i', inputName,
+      '-map', '0:v:0',
+      '-map', '0:a?',
+      '-c:v', 'libx264',
+      '-preset', 'veryfast',
+      '-b:v', videoKbps + 'k',
+      '-maxrate', videoKbps + 'k',
+      '-bufsize', (videoKbps * 2) + 'k',
+      '-pix_fmt', 'yuv420p',
+      '-c:a', 'aac',
+      '-b:a', audioKbps + 'k',
+      '-movflags', '+faststart',
+      '-y', outputName
+    ]);
+
+    if (exitCode !== 0) {
+      throw new Error('O FFmpeg não conseguiu processar o vídeo.');
+    }
+
+    const result = await ffmpeg.readFile(outputName);
+    const blob = new Blob([result], { type: 'video/mp4' });
+
+    if (outputUrl) URL.revokeObjectURL(outputUrl);
+    outputUrl = URL.createObjectURL(blob);
+
+    const download = document.querySelector('#download');
+    download.href = outputUrl;
+    download.download = 'clipshrink.mp4';
+
+    document.querySelector('#finalSize').textContent =
+      sizeText(blob.size);
+
+    const reduction = (1 - blob.size / file.size) * 100;
+
+    document.querySelector('#reduction').textContent =
+      reduction.toFixed(1) + '%';
+
+    document.querySelector('#result').hidden = false;
+    progress.value = 100;
+
+    if (blob.size <= targetBytes) {
+      setStatus('Concluído! Seu clipe está pronto para baixar.');
+    } else {
+      setStatus(
+        'Vídeo processado, mas ficou acima da meta. ' +
+        'Tente novamente com um tamanho desejado maior.'
+      );
+    }
+
+    await ffmpeg.deleteFile(inputName);
+    await ffmpeg.deleteFile(outputName);
+
+  } catch (error) {
+    console.error(error);
+    setStatus('Erro: ' + (error.message || 'falha na compressão.'));
+  } finally {
+    running = false;
+    compress.disabled = false;
+  }
 });
-compress.addEventListener('click',()=>{
- if(!picker.files[0]){
-  setStatus('Selecione um vídeo primeiro.');
-  return;
- }
- if(!target.value||Number(target.value)<=0){
-  setStatus('Digite um tamanho final válido em MB.');
-  return;
- }
- setStatus('A interface está pronta, mas o motor FFmpeg ainda precisa ser integrado. Nenhum vídeo foi compactado.');
+
+window.addEventListener('beforeunload', () => {
+  if (source) URL.revokeObjectURL(source);
+  if (outputUrl) URL.revokeObjectURL(outputUrl);
 });
 </script>
 </body>
