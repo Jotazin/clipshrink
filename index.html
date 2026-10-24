@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClipShrink — Compactador de Clipes</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:#f1f5ff;font-family:Arial,sans-serif}
+main{width:min(760px,92%);margin:45px auto}
+header{display:flex;align-items:center;gap:13px;margin-bottom:32px}
+.logo{width:49px;height:49px;border-radius:15px;background:#1768e8;display:grid;place-items:center;font-size:25px}
+h1{margin:0;font-size:27px}
+header p,.muted{color:#8fa4c4;font-size:14px}
+.panel{background:#101a2c;border:1px solid #23344f;border-radius:20px;padding:25px;margin-bottom:18px}
+h2{font-size:17px;margin:0 0 17px}
+.upload{border:2px dashed #30496c;border-radius:15px;padding:30px 12px;text-align:center;cursor:pointer}
+.upload:hover{border-color:#398bff;background:#12223b}
+.upload .symbol{font-size:38px;color:#62a5ff}
+input,button{font:inherit}
+input[type=file]{display:none}
+input[type=number]{width:100%;padding:13px;background:#091323;border:1px solid #30415d;border-radius:10px;color:white;margin-top:8px}
+button{border:0;border-radius:11px;padding:14px;background:#2478f5;color:white;font-weight:bold;cursor:pointer;width:100%;margin-top:16px}
+button:disabled{opacity:.5;cursor:wait}
+button.secondary{background:#1b2c45}
+button:focus-visible,.upload:focus-visible{outline:2px solid #8dc0ff;outline-offset:3px}
+.file{display:none;background:#0b1526;border-radius:12px;padding:13px;margin-top:15px;overflow-wrap:anywhere}
+video{display:none;width:100%;max-height:330px;margin-top:15px;border-radius:12px;background:#000}
+.row{display:flex;justify-content:space-between;gap:12px;margin-top:15px;font-size:14px}
+progress{width:100%;height:9px;accent-color:#3286ff;margin-top:14px}
+#status{color:#a9c5ed;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+footer{text-align:center;color:#657895;font-size:12px;padding:15px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div class="logo">▶</div>
+<div><h1>ClipShrink</h1><p>Compactador de clipes para Discord</p></div>
+</header>
+
+<section class="panel">
+<h2>01 / Escolha seu clipe</h2>
+<label class="upload" for="videoFile" tabindex="0" role="button">
+<div class="symbol">⇧</div>
+<strong>Selecione seu vídeo</strong>
+<p class="muted">Clique aqui para escolher um arquivo do PC</p>
+<p class="muted">O vídeo será processado localmente no navegador.</p>
+</label>
+<input id="videoFile" type="file" accept="video/*">
+<div id="fileInfo" class="file"></div>
+<video id="preview" controls playsinline></video>
+</section>
+
+<section class="panel">
+<h2>02 / Defina o tamanho final</h2>
+<label for="target">Tamanho desejado (MB)</label>
+<input id="target" type="number" min="1" max="100000" value="50" step="1">
+<div class="row"><span>Original</span><strong id="originalSize">—</strong></div>
+<div class="row"><span>Meta de saída</span><strong id="targetLabel">50 MB</strong></div>
+<button id="compress">COMPACTAR CLIPE</button>
+<p id="status" role="status" aria-live="polite">Selecione um vídeo para começar.</p>
+<progress id="progress" value="0" max="100" hidden></progress>
+</section>
+
+<section class="panel" id="result" hidden>
+<h2>03 / Seu vídeo compactado</h2>
+<div class="row"><span>Tamanho final</span><strong id="finalSize"></strong></div>
+<div class="row"><span>Redução</span><strong id="reduction"></strong></div>
+<a id="download" download="clipshrink.mp4"><button>BAIXAR VÍDEO</button></a>
+</section>
+
+<footer>ClipShrink · Seus vídeos permanecem no seu dispositivo.</footer>
+</main>
+
+<script>
+const picker=document.querySelector('#videoFile');
+const target=document.querySelector('#target');
+const info=document.querySelector('#fileInfo');
+const preview=document.querySelector('#preview');
+const status=document.querySelector('#status');
+const compress=document.querySelector('#compress');
+const progress=document.querySelector('#progress');
+let source=null;
+let outputUrl=null;
+
+function sizeText(bytes){
+ return bytes >= 1000000000
+ ? (bytes/1000000000).toFixed(2)+' GB'
+ : (bytes/1000000).toFixed(2)+' MB';
+}
+function setStatus(text){status.textContent=text;}
+
+picker.addEventListener('change',()=>{
+ const file=picker.files[0];
+ if(!file)return;
+ if(source)URL.revokeObjectURL(source);
+ source=URL.createObjectURL(file);
+ preview.src=source;
+ preview.style.display='block';
+ info.style.display='block';
+ info.textContent=file.name+' · '+sizeText(file.size);
+ document.querySelector('#originalSize').textContent=sizeText(file.size);
+ document.querySelector('#result').hidden=true;
+ setStatus('Vídeo selecionado. O mecanismo de compressão será carregado ao iniciar.');
+});
+target.addEventListener('input',()=>{
+ document.querySelector('#targetLabel').textContent=(target.value||'0')+' MB';
+});
+document.querySelector('.upload').addEventListener('keydown',e=>{
+ if(e.key==='Enter'||e.key===' '){e.preventDefault();picker.click();}
+});
+window.addEventListener('beforeunload',()=>{
+ if(source)URL.revokeObjectURL(source);
+ if(outputUrl)URL.revokeObjectURL(outputUrl);
+});
+compress.addEventListener('click',()=>{
+ if(!picker.files[0]){
+  setStatus('Selecione um vídeo primeiro.');
+  return;
+ }
+ if(!target.value||Number(target.value)<=0){
+  setStatus('Digite um tamanho final válido em MB.');
+  return;
+ }
+ setStatus('A interface está pronta, mas o motor FFmpeg ainda precisa ser integrado. Nenhum vídeo foi compactado.');
+});
+</script>
+</body>
+</html>
