@@ -5,34 +5,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080d1b">
+  <meta name="theme-color" content="#8f0b16">
   <title>ClipsAlta — Compressor de Vídeos</title>
   <style>
     * { box-sizing: border-box; }
 
     :root {
-      --bg: #080d1b;
-      --panel: #111a2d;
-      --panel2: #0d1527;
-      --blue: #4388ff;
-      --blue2: #2463eb;
+      --bg: #160407;
+      --panel: #2a0b10;
+      --panel2: #1d070b;
+      --blue: #ff3948;
+      --blue2: #c91024;
       --text: #f3f6ff;
       --muted: #91a0bb;
-      --border: rgba(130, 160, 220, .16);
+      --border: rgba(255, 90, 105, .22);
     }
 
     body {
       margin: 0;
       min-height: 100vh;
       color: var(--text);
-      background:
-        linear-gradient(180deg, rgba(5, 9, 18, .72), rgba(5, 9, 18, .86)),
-        url('./alta.png') center center / cover fixed,
-        var(--bg);
-      background-repeat: no-repeat;
-      background-color: var(--bg);
+      background: var(--bg);
       font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+      isolation: isolate;
     }
+
+    /* Vídeo decorativo de fundo: mantenha fundo.mp4 junto do index.html */
+    #backgroundVideo {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      z-index: -2;
+      pointer-events: none;
+      background: var(--bg);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(35, 0, 5, .62), rgba(15, 0, 3, .82));
+    }
+
+    header, main, footer { position: relative; z-index: 1; }
 
     button, input { font: inherit; }
 
@@ -61,16 +81,16 @@
       width: 39px;
       height: 39px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #579bff, #2559e8);
-      box-shadow: 0 5px 25px #2463eb44;
+      background: linear-gradient(135deg, #ff5360, #c91024);
+      box-shadow: 0 5px 25px #c9102444;
     }
 
     .brand-icon svg { width: 21px; height: 21px; }
 
     .local-tag {
-      color: #a7c9ff;
-      border: 1px solid #356ac655;
-      background: #18315a66;
+      color: #ffb2b9;
+      border: 1px solid #a81b2b88;
+      background: #5b101b88;
       padding: 8px 12px;
       border-radius: 20px;
       font-size: 12px;
@@ -84,7 +104,7 @@
     .hero { text-align: center; margin-bottom: 30px; }
 
     .eyebrow {
-      color: #78aaff;
+      color: #ff6b78;
       text-transform: uppercase;
       font-size: 11px;
       font-weight: 800;
@@ -99,7 +119,7 @@
     }
 
     h1 span {
-      background: linear-gradient(90deg, #76b4ff, #3981ff);
+      background: linear-gradient(90deg, #ff9ba4, #e51e32);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -114,7 +134,7 @@
     }
 
     .card {
-      background: linear-gradient(145deg, rgba(18,29,50,.94), rgba(13,21,39,.96));
+      background: linear-gradient(145deg, rgba(43, 8, 14, .92), rgba(24, 5, 9, .95));
       border: 1px solid var(--border);
       border-radius: 22px;
       padding: 24px;
@@ -124,20 +144,20 @@
     .dropzone {
       min-height: 175px;
       padding: 25px 16px;
-      border: 1.5px dashed #3d5b8b;
+      border: 1.5px dashed #8b303b;
       border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      background: #14213a66;
+      background: #3d0c1466;
       cursor: pointer;
       transition: .2s;
     }
 
     .dropzone:hover, .dropzone.drag {
       border-color: var(--blue);
-      background: #1c376033;
+      background: #6a101d44;
     }
 
     .upload-icon {
@@ -147,8 +167,8 @@
       display: grid;
       place-items: center;
       border-radius: 15px;
-      color: #8dbbff;
-      background: #2a5aab40;
+      color: #ff9aa3;
+      background: #7e152440;
     }
 
     .upload-icon svg { width: 25px; height: 25px; }
@@ -162,7 +182,7 @@
       padding: 13px;
       border: 1px solid var(--border);
       border-radius: 13px;
-      background: #0b1323;
+      background: #21070c;
       align-items: center;
       gap: 12px;
     }
@@ -174,8 +194,8 @@
       display: grid;
       place-items: center;
       border-radius: 12px;
-      background: #1e3f77;
-      color: #a6ceff;
+      background: #641522;
+      color: #ffc0c5;
       font-size: 12px;
       font-weight: 800;
     }
@@ -216,7 +236,7 @@
     .field-label {
       display: block;
       margin-bottom: 9px;
-      color: #dbe5f8;
+      color: #ffe6e8;
       font-size: 13px;
       font-weight: 700;
     }
@@ -227,10 +247,10 @@
       width: 100%;
       height: 48px;
       padding: 0 48px 0 14px;
-      border: 1px solid #2b3a56;
+      border: 1px solid #71303a;
       outline: none;
       border-radius: 12px;
-      background: #0a1222;
+      background: #1b060a;
       color: white;
     }
 
@@ -258,11 +278,11 @@
       min-height: 51px;
       border: 0;
       border-radius: 13px;
-      background: linear-gradient(100deg, #347eff, #2860ed);
+      background: linear-gradient(100deg, #f02a3d, #b90e23);
       color: white;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 8px 25px #2463eb35;
+      box-shadow: 0 8px 25px #c9102435;
       transition: .2s;
     }
 
@@ -283,12 +303,12 @@
       font-size: 12px;
     }
 
-    #status { color: #bdcbe1; }
-    #percent { color: #83b5ff; font-weight: 800; }
+    #status { color: #e5c3c7; }
+    #percent { color: #ff8792; font-weight: 800; }
 
     .progress-track {
       height: 7px;
-      background: #26334a;
+      background: #4a2027;
       border-radius: 10px;
       overflow: hidden;
     }
@@ -297,7 +317,7 @@
       height: 100%;
       width: 0%;
       border-radius: inherit;
-      background: linear-gradient(90deg, #3579ff, #7cb7ff);
+      background: linear-gradient(90deg, #ed293d, #ff9ba4);
       transition: width .2s;
     }
 
@@ -343,12 +363,12 @@
       display: flex;
       gap: 10px;
       align-items: flex-start;
-      color: #8393af;
+      color: #c09aa0;
       font-size: 11px;
       line-height: 1.7;
     }
 
-    .privacy span { color: #82b8ff; }
+    .privacy span { color: #ff8792; }
 
     footer {
       text-align: center;
@@ -368,6 +388,9 @@
   </style>
 </head>
 <body>
+  <video id="backgroundVideo" autoplay muted loop playsinline aria-hidden="true" preload="metadata">
+    <source src="fundo.mp4" type="video/mp4">
+  </video>
   <header class="topbar">
     <div class="brand">
       <div class="brand-icon">
@@ -475,7 +498,7 @@
     </section>
   </main>
 
-  <footer>ClipsAlta · Ferramenta gratuita de compressão de vídeos<br><span style="display:inline-block;margin-top:8px;color:#9ba8bd;letter-spacing:.6px">Créditos: <strong style="color:#dce6f8">Goten</strong></span></footer>
+  <footer>ClipsAlta · Ferramenta gratuita de compressão de vídeos<br><span style="display:inline-block;margin-top:8px;color:#d2aeb3;letter-spacing:.6px">Créditos: <strong style="color:#ffe4e7">Goten</strong></span></footer>
 
   <script type="module">
     import { FFmpeg } from
