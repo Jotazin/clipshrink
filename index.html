@@ -133,16 +133,22 @@ async function loadEngine() {
     const base =
       'https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd';
 
-    await engine.load({
-      coreURL: await toBlobURL(
-        base + '/ffmpeg-core.js',
-        'text/javascript'
-      ),
-      wasmURL: await toBlobURL(
-        base + '/ffmpeg-core.wasm',
-        'application/wasm'
-      )
-    });
+    
+ await engine.load({
+  classWorkerURL: new URL(
+    'worker.js',
+    window.location.href
+  ).href,
+  coreURL: await toBlobURL(
+    base + '/ffmpeg-core.js',
+    'text/javascript'
+  ),
+  wasmURL: await toBlobURL(
+    base + '/ffmpeg-core.wasm',
+    'application/wasm'
+  )
+});
+
 
     ffmpeg = engine;
   } finally {
