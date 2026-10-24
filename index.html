@@ -7,23 +7,20 @@
   <title>ClipShrink</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
+      padding: 28px 16px;
       min-height: 100vh;
-      padding: 30px 16px;
       background: #070d1b;
       color: #f1f5ff;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: Arial, sans-serif;
     }
 
     .container {
-      width: 100%;
       max-width: 850px;
-      margin: 0 auto;
+      margin: auto;
     }
 
     header {
@@ -37,23 +34,19 @@
       letter-spacing: -1.5px;
     }
 
-    .logo span {
-      color: #3997ff;
-    }
+    .logo span { color: #3997ff; }
 
     header p {
       color: #8b9bb7;
-      margin-top: 10px;
       font-size: 14px;
     }
 
     .panel {
+      padding: 24px;
+      margin-bottom: 18px;
       background: #101a2d;
       border: 1px solid #223451;
       border-radius: 18px;
-      padding: 24px;
-      margin-bottom: 18px;
-      box-shadow: 0 12px 35px #00000020;
     }
 
     .panel h2 {
@@ -63,13 +56,12 @@
 
     .dropzone {
       display: block;
-      text-align: center;
-      border: 2px dashed #31517d;
-      background: #0b1425;
-      border-radius: 14px;
       padding: 28px 15px;
+      text-align: center;
       cursor: pointer;
-      transition: 0.2s;
+      background: #0b1425;
+      border: 2px dashed #31517d;
+      border-radius: 14px;
     }
 
     .dropzone:hover {
@@ -93,17 +85,14 @@
       line-height: 1.6;
     }
 
-    input[type="file"] {
-      display: none;
-    }
+    input[type="file"] { display: none; }
 
     video {
-      display: block;
       width: 100%;
       max-height: 400px;
+      margin-top: 18px;
       background: #05080e;
       border-radius: 12px;
-      margin-top: 18px;
     }
 
     .file-info {
@@ -117,9 +106,7 @@
       overflow-wrap: anywhere;
     }
 
-    .field {
-      margin-bottom: 20px;
-    }
+    .field { margin-bottom: 20px; }
 
     .field label {
       display: block;
@@ -131,38 +118,31 @@
     input[type="number"] {
       width: 100%;
       padding: 14px;
-      border: 1px solid #304564;
-      border-radius: 10px;
       background: #0b1425;
       color: white;
-      outline: none;
+      border: 1px solid #304564;
+      border-radius: 10px;
       font-size: 16px;
+      outline: none;
     }
 
-    input[type="number"]:focus {
-      border-color: #3997ff;
-    }
+    input[type="number"]:focus { border-color: #3997ff; }
 
     .button {
       display: block;
       width: 100%;
       padding: 15px;
-      border: none;
-      border-radius: 11px;
       background: linear-gradient(100deg, #1677ef, #3997ff);
       color: white;
+      border: 0;
+      border-radius: 11px;
       font-size: 15px;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .button:hover {
-      filter: brightness(1.1);
     }
 
     .button:disabled {
-      opacity: 0.55;
+      opacity: .55;
       cursor: not-allowed;
     }
 
@@ -191,14 +171,14 @@
       width: 0%;
       height: 100%;
       background: #3997ff;
-      transition: width 0.2s;
+      transition: width .2s;
     }
 
     .status {
+      margin-top: 13px;
       color: #9eb0cb;
       font-size: 13px;
-      line-height: 1.6;
-      margin-top: 13px;
+      line-height: 1.7;
       overflow-wrap: anywhere;
     }
 
@@ -206,15 +186,14 @@
       display: none;
       margin-top: 20px;
       padding: 18px;
+      background: #0c2526;
       border: 1px solid #245c52;
       border-radius: 12px;
-      background: #0c2526;
     }
 
     .result h3 {
-      margin: 0 0 12px;
       color: #75e5bd;
-      font-size: 17px;
+      margin: 0 0 12px;
     }
 
     .result p {
@@ -225,14 +204,14 @@
 
     .download {
       display: block;
-      text-align: center;
-      text-decoration: none;
       margin-top: 15px;
       padding: 13px;
-      border-radius: 10px;
+      text-align: center;
+      text-decoration: none;
       background: #1ca779;
       color: white;
       font-weight: bold;
+      border-radius: 10px;
     }
 
     .notice {
@@ -246,20 +225,15 @@
     }
 
     footer {
+      padding: 15px 0;
       text-align: center;
       color: #62738e;
       font-size: 12px;
-      padding: 15px 0;
     }
 
     @media (max-width: 500px) {
-      .panel {
-        padding: 18px;
-      }
-
-      .logo {
-        font-size: 30px;
-      }
+      .panel { padding: 18px; }
+      .logo { font-size: 30px; }
     }
   </style>
 </head>
@@ -283,7 +257,6 @@
       <input id="videoInput" type="file" accept="video/*">
 
       <video id="preview" controls hidden></video>
-
       <div id="fileInfo" class="file-info"></div>
     </section>
 
@@ -292,17 +265,11 @@
 
       <div class="field">
         <label for="targetSize">Tamanho final desejado (MB)</label>
-        <input
-          id="targetSize"
-          type="number"
-          min="1"
-          max="5000"
-          value="50"
-          step="1"
-        >
+        <input id="targetSize" type="number" min="1" max="5000"
+               value="50" step="1">
         <p class="muted">
-          Escolha o tamanho aproximado que deseja atingir.
-          O resultado pode variar conforme o vídeo.
+          Escolha o tamanho aproximado desejado. O resultado pode variar
+          conforme a duração, a resolução e o conteúdo do vídeo.
         </p>
       </div>
 
@@ -315,7 +282,6 @@
           <span id="progressLabel">Preparando...</span>
           <span id="progressPercent">0%</span>
         </div>
-
         <div class="progress-track">
           <div id="progressBar" class="progress-bar"></div>
         </div>
@@ -328,28 +294,27 @@
       <div id="result" class="result">
         <h3>Compressão concluída!</h3>
         <p id="resultInfo"></p>
-        <a id="downloadLink" class="download" href="#" download="clipshrink.mp4">
+        <a id="downloadLink" class="download" href="#"
+           download="clipshrink-comprimido.mp4">
           Baixar vídeo comprimido
         </a>
       </div>
 
       <div class="notice">
-        🔒 O vídeo é processado no seu navegador. Ele não é enviado para
-        um servidor do ClipShrink. Na primeira utilização, o motor de
-        compressão precisa ser baixado da internet.
+        🔒 O processamento acontece no navegador do seu computador.
+        O vídeo não é enviado para um servidor do ClipShrink.
+        Na primeira utilização, o motor de compressão precisa ser
+        baixado da internet.
       </div>
     </section>
 
     <footer>ClipShrink · Compressão de vídeo no navegador</footer>
   </main>
 
-  <script type="module">
-    import { FFmpeg } from
-      'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
+  <!-- API clássica do FFmpeg.wasm -->
+  <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 
-    import { toBlobURL } from
-      'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.2/dist/esm/index.js';
-
+  <script>
     const input = document.getElementById('videoInput');
     const preview = document.getElementById('preview');
     const fileInfo = document.getElementById('fileInfo');
@@ -367,12 +332,11 @@
     let selectedFile = null;
     let previewURL = null;
     let outputURL = null;
-    let engine = null;
+    let ffmpeg = null;
     let engineLoading = null;
     let isCompressing = false;
 
     function formatSize(bytes) {
-      if (!Number.isFinite(bytes) || bytes < 0) return 'Desconhecido';
       if (bytes < 1024 * 1024) {
         return (bytes / 1024).toFixed(1) + ' KB';
       }
@@ -422,8 +386,7 @@
       preview.load();
 
       fileInfo.style.display = 'block';
-      fileInfo.textContent =
-        file.name + ' · ' + formatSize(file.size);
+      fileInfo.textContent = file.name + ' · ' + formatSize(file.size);
 
       compressBtn.disabled = false;
       compressBtn.textContent = 'Comprimir vídeo';
@@ -433,55 +396,40 @@
     });
 
     async function loadEngine() {
-      if (engine && engine.loaded) return engine;
+      if (ffmpeg && ffmpeg.isLoaded()) return ffmpeg;
       if (engineLoading) return engineLoading;
 
       engineLoading = (async () => {
-        setStatus('Baixando o motor de compressão. Aguarde...');
+        if (!window.FFmpeg || !window.FFmpeg.createFFmpeg) {
+          throw new Error(
+            'Não foi possível carregar a biblioteca. Verifique sua conexão e atualize a página.'
+          );
+        }
 
-        const ffmpeg = new FFmpeg();
+        setStatus('Carregando o motor de compressão...');
 
-        ffmpeg.on('log', ({ message }) => {
-          console.log('[FFmpeg]', message);
+        const instance = window.FFmpeg.createFFmpeg({
+          log: true,
+          corePath:
+            'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
         });
 
-        ffmpeg.on('progress', ({ progress }) => {
-          if (isCompressing && Number.isFinite(progress)) {
-            const percent = Math.min(99, Math.max(0, progress * 100));
-            setProgress(percent, 'Comprimindo vídeo...');
+        instance.setProgress(({ ratio }) => {
+          if (isCompressing && Number.isFinite(ratio)) {
+            setProgress(
+              Math.min(99, ratio * 100),
+              'Comprimindo vídeo...'
+            );
           }
         });
 
-        /*
-         * O worker local evita o erro de origem cruzada do worker
-         * do FFmpeg no GitHub Pages.
-         *
-         * A versão 0.12.6 do core UMD é usada aqui por compatibilidade.
-         */
-        const base =
-          'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
-
-        const classWorkerURL =
-          new URL('./worker.js', window.location.href).href;
-
-        const coreURL = await toBlobURL(
-          base + '/ffmpeg-core.js',
-          'text/javascript'
-        );
-
-        const wasmURL = await toBlobURL(
-          base + '/ffmpeg-core.wasm',
-          'application/wasm'
-        );
-
-        await ffmpeg.load({
-          classWorkerURL,
-          coreURL,
-          wasmURL
+        instance.setLogger(({ message }) => {
+          console.log('[FFmpeg]', message);
         });
 
-        engine = ffmpeg;
-        return engine;
+        await instance.load();
+        ffmpeg = instance;
+        return instance;
       })();
 
       try {
@@ -497,13 +445,13 @@
       const targetMB = Number(targetSize.value);
 
       if (!Number.isFinite(targetMB) || targetMB < 1) {
-        setStatus('Digite um tamanho final de pelo menos 1 MB.');
+        setStatus('Digite um tamanho desejado de pelo menos 1 MB.');
         return;
       }
 
       if (targetMB * 1024 * 1024 >= selectedFile.size) {
         setStatus(
-          'O tamanho desejado precisa ser menor que o tamanho original.'
+          'O tamanho desejado precisa ser menor que o arquivo original.'
         );
         return;
       }
@@ -515,36 +463,21 @@
       setProgress(0, 'Preparando...');
       setStatus('Iniciando o motor de compressão...');
 
-      let inputName = '';
-      let outputName = '';
+      const inputName = 'clipshrink_input';
+      const outputName = 'clipshrink_output.mp4';
 
       try {
-        const ffmpeg = await loadEngine();
+        const engine = await loadEngine();
 
-        setStatus('Preparando arquivo para compressão...');
+        setStatus('Preparando o vídeo...');
 
-        const extensionMatch = selectedFile.name.match(/\.([^.]+)$/);
-        const extension = extensionMatch
-          ? extensionMatch[1].toLowerCase().replace(/[^a-z0-9]/g, '')
-          : 'mp4';
-
-        inputName = 'input_video.' + (extension || 'mp4');
-        outputName = 'compressed_video.mp4';
-
-        await ffmpeg.writeFile(
-          inputName,
-          new Uint8Array(await selectedFile.arrayBuffer())
+        const fileData = new Uint8Array(
+          await selectedFile.arrayBuffer()
         );
 
-        /*
-         * Reserva parte do tamanho para o áudio e o contêiner MP4.
-         * A taxa de bits é estimada a partir da duração do vídeo.
-         */
-        let duration = 0;
+        engine.FS('writeFile', inputName, fileData);
 
-        try {
-          duration = preview.duration;
-        } catch (_) {}
+        let duration = preview.duration;
 
         if (!Number.isFinite(duration) || duration <= 0) {
           duration = 60;
@@ -557,14 +490,14 @@
 
         if (videoKbps < 50) {
           throw new Error(
-            'O tamanho desejado é muito pequeno para a duração deste vídeo. Tente um valor maior.'
+            'O tamanho escolhido é pequeno demais para este vídeo. Tente um alvo maior.'
           );
         }
 
-        setStatus('Comprimindo vídeo. Não feche esta página...');
+        setStatus('Comprimindo. Não feche a página...');
         setProgress(0, 'Comprimindo vídeo...');
 
-        await ffmpeg.exec([
+        await engine.run(
           '-i', inputName,
           '-map', '0:v:0',
           '-map', '0:a:0?',
@@ -578,20 +511,20 @@
           '-b:a', audioKbps + 'k',
           '-movflags', '+faststart',
           '-y', outputName
-        ]);
+        );
 
-        setProgress(100, 'Finalizando arquivo...');
-
-        const outputData = await ffmpeg.readFile(outputName);
+        const outputData = engine.FS('readFile', outputName);
         const outputBlob = new Blob(
           [outputData],
           { type: 'video/mp4' }
         );
 
         outputURL = URL.createObjectURL(outputBlob);
+
         downloadLink.href = outputURL;
         downloadLink.download =
-          selectedFile.name.replace(/\.[^.]+$/, '') + '_comprimido.mp4';
+          selectedFile.name.replace(/\.[^.]+$/, '') +
+          '_comprimido.mp4';
 
         const reduction = (
           (1 - outputBlob.size / selectedFile.size) * 100
@@ -603,30 +536,28 @@
           ' · Redução: ' + reduction + '%';
 
         result.style.display = 'block';
+        setProgress(100, 'Concluído!');
 
         if (outputBlob.size > targetBytes) {
           setStatus(
-            'Compressão concluída, mas o arquivo ficou maior que o alvo. ' +
-            'Tente novamente com um tamanho desejado maior ou ajuste a qualidade.'
+            'Vídeo pronto, mas ficou acima do tamanho desejado. ' +
+            'Tente novamente com um alvo maior.'
           );
         } else {
-          setStatus('Pronto! Seu vídeo comprimido está disponível para baixar.');
+          setStatus('Pronto! Clique para baixar o vídeo comprimido.');
         }
 
-        try {
-          await ffmpeg.deleteFile(inputName);
-          await ffmpeg.deleteFile(outputName);
-        } catch (_) {}
+        try { engine.FS('unlink', inputName); } catch (_) {}
+        try { engine.FS('unlink', outputName); } catch (_) {}
 
       } catch (error) {
         console.error('Erro na compressão:', error);
-
-        const message = error && error.message
-          ? error.message
-          : String(error);
-
-        setStatus('Erro: ' + message);
+        setStatus(
+          'Erro na compressão: ' +
+          (error && error.message ? error.message : String(error))
+        );
         progressLabel.textContent = 'Falha na compressão';
+
       } finally {
         isCompressing = false;
         compressBtn.disabled = !selectedFile;
